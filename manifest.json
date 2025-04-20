@@ -1,0 +1,13 @@
+{
+  "name": "Chrome Reading List Migrator",
+  "description": "An extension to help migrate content from Chrome's reading list to wallabag",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "hello_extensions.png"
+  },
+  "permissions": [
+      "readingList"
+  ]
+}
