@@ -4,7 +4,7 @@
 
 const Common = (() => {
     const translate = (key) => {
-        return key;
+        return key.replace(/_/g, ' ');
         // TODO: setup translations.  I think what I need is to copy the _locales folder from wallabagger and then fill in missing translations from there.
         // but as this extension is a side project I'm happy to leave it English-only for now; if someone wants to contribute translations I'd take a PR
         /*
