@@ -8,6 +8,14 @@
     "default_icon": "hello_extensions.png"
   },
   "permissions": [
-      "readingList"
-  ]
+      "readingList",
+      "storage"
+  ],
+  "optional_host_permissions": [
+    "*://*/*"
+  ],
+  "options_ui": {
+      "page": "options.html",
+      "open_in_tab": true
+  }
 }
