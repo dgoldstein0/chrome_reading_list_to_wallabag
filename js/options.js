@@ -1,4 +1,4 @@
-import {setup, saveSetup, setupGetToken, setupCheckUrl} from './model.js';
+import {setup, saveSetup, setupGetToken, setupCheckUrl, migrateToWallabag} from './model.js';
 
 
 class OptionsController {
@@ -436,8 +436,71 @@ class OptionsController {
 
 };
 
+async function initMigrationSection() {
+  const readingListEntries = await chrome.readingList.query({});
+
+  let numRead = 0;
+  let numUnread = 0;
+  for (const entry of readingListEntries) {
+    if (entry.hasBeenRead) {
+      numRead++;
+    } else {
+      numUnread++;
+    }
+  }
+
+  document.getElementById("reading_list_info").innerText = `${numRead} read entries and ${numUnread} unread entries`;
+
+  const migrateReadEl = document.getElementById("migrate_read");
+  const archiveReadEl = document.getElementById("archive_read");
+  if (numUnread === 0) {
+    migrateReadEl.disabled = true;
+    archiveReadEl.disabled = true;
+  }
+
+  const migrateUnreadEl = document.getElementById("migrate_unread");
+  const archiveUnreadEl = document.getElementById("archive_unread");
+  if (numRead === 0) {
+    migrateUnreadEl.disabled = true;
+    archiveUnreadEl.disabled = true;
+  }
+
+  const tagsEl = document.getElementsByName("tag")[0];
+
+  const migrationButton = document.getElementById("migration_button");
+  if (numUnread === 0 && numRead === 0) {
+    migrationButton.disabled = true;
+  } else {
+    // fill in migration plan
+
+    migrationButton.addEventListener("click", async () => {
+      migrationButton.disabled = true;
+      const migrationProgressEl = document.getElementById("migration_progress");
+      migrationProgressEl.interText = "Working...";
+
+      const migrateUnread = migrateUnreadEl.checked;
+      const migrateRead = migrateReadEl.checked;
+      const archiveUnread = archiveUnreadEl.checked;
+      const archiveRead = archiveReadEl.checked;
+
+      const {migrated, skipped} = await migrateToWallabag({
+        migrateUnread,
+        migrateRead,
+        archiveUnread,
+        archiveRead,
+        tagsToAdd: [tagsEl.value.trim()],
+        readingListEntries,
+      });
+
+      migrationProgressEl.innerText = `Success! Migrated ${migrated} and skipped ${skipped} entries from reading list to Wallabag.`;
+    });
+
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async function () {
     Common.translateAll();
     const PC = new OptionsController();
     await PC.init();
+    await initMigrationSection();
 });

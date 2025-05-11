@@ -48,3 +48,41 @@ export async function setupCheckUrl(data) {
       return [api.data, false];
     }
 }
+
+export async function migrateToWallabag(options) {
+  const {migrateUnread, migrateRead, archiveUnread, archiveRead, tagsToAdd, readingListEntries} = options;
+
+  let skipped = 0;
+  let migrated = 0;
+
+  for (const entry of readingListEntries) {
+
+    const shouldMigrate = entry.hasBeenRead ? migrateRead : migrateUnread;
+    const shouldArchive = entry.hasBeenRead ? archiveRead : archiveUnread;
+
+    if (shouldMigrate) {
+      console.log(`migrating ${entry.url}`);
+
+      const {exists} = await api.EntryExists(entry.url);
+
+      if (!exists) {
+        const {id: articleId} = await api.SavePage({
+          url: entry.url,
+          title: entry.title,
+          archive: shouldArchive,
+        })
+        migrated++;
+
+        await api.SaveTags(articleId, tagsToAdd);
+      } else {
+        skipped++;
+      }
+    }
+
+  }
+
+  return {
+    migrated,
+    skipped
+  };
+}

@@ -228,6 +228,21 @@
         <button class="btn params-button" id="loadFromFile-button" data-i18n="Load_from_file">Load from file</button>
         <input type="file" style="display:none" id="openFile-dialog"/>
     </div>
+    <div class="column col-12">
+        <h1>Migration</h1>
+
+        <p>Your reading list contains <span id="reading_list_info">(loading...)</span></p>
+        <label class="form-switch" for="migrate_read"><input type="checkbox" id="migrate_read" /><i class="form-icon"></i>Migrate read items</label>
+        <label class="form-switch" for="migrate_unread"><input type="checkbox" id="migrate_unread" /><i class="form-icon"></i>Migrate unread items</label>
+        <label class="form-switch" for="archive_read"><input type="checkbox" id="archive_read" checked /><i class="form-icon"></i>Archive read items</label>
+        <label class="form-switch" for="archive_unread"><input type="checkbox" id="archive_unread" /><i class="form-icon"></i>Archive unread items</label>
+        <label for="tag">Tag migrated urls? <input type="text" name="tag" value="Migrated from Chrome Reading List" size="50"/></label>
+        <br />
+        <button id="migration_button">Migrate!</button>
+        <span id="migration_progress"></span>
+
+    </div>
+
 
     <div class="modal modal-sm" id="https-message">
         <div class="modal-overlay"></div>

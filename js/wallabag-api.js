@@ -39,7 +39,6 @@ WallabagApi.prototype = {
         AllowExistSafe: null,
         Debug: false,
         AutoAddSingleTag: false,
-        ArchiveByDefault: false,
         sitesToFetchLocally: null,
         FetchLocallyByDefault: false
     },
@@ -243,7 +242,7 @@ WallabagApi.prototype = {
 
     SavePage: function (options) {
         const content = { url: options.url };
-        if (this.data.ArchiveByDefault === true) {
+        if (options.archive) {
             content.archive = 1;
         }
         if (options.title) {
