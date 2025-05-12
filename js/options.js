@@ -436,8 +436,17 @@ class OptionsController {
 
 };
 
-async function initMigrationSection() {
-  const readingListEntries = await chrome.readingList.query({});
+
+const migrateReadEl = document.getElementById("migrate_read");
+const archiveReadEl = document.getElementById("archive_read");
+const migrateUnreadEl = document.getElementById("migrate_unread");
+const archiveUnreadEl = document.getElementById("archive_unread");
+const tagsEl = document.getElementsByName("tag")[0];
+const migrationButton = document.getElementById("migration_button");
+let readingListEntries;
+
+async function updateMigrationSection() {
+  readingListEntries = await chrome.readingList.query({});
 
   let numRead = 0;
   let numUnread = 0;
@@ -451,56 +460,56 @@ async function initMigrationSection() {
 
   document.getElementById("reading_list_info").innerText = `${numRead} read entries and ${numUnread} unread entries`;
 
-  const migrateReadEl = document.getElementById("migrate_read");
-  const archiveReadEl = document.getElementById("archive_read");
   if (numUnread === 0) {
     migrateReadEl.disabled = true;
     archiveReadEl.disabled = true;
   }
 
-  const migrateUnreadEl = document.getElementById("migrate_unread");
-  const archiveUnreadEl = document.getElementById("archive_unread");
   if (numRead === 0) {
     migrateUnreadEl.disabled = true;
     archiveUnreadEl.disabled = true;
   }
 
-  const tagsEl = document.getElementsByName("tag")[0];
-
-  const migrationButton = document.getElementById("migration_button");
   if (numUnread === 0 && numRead === 0) {
     migrationButton.disabled = true;
   } else {
+    migrationButton.disabled = false;
+
     // fill in migration plan
 
-    migrationButton.addEventListener("click", async () => {
-      migrationButton.disabled = true;
-      const migrationProgressEl = document.getElementById("migration_progress");
-      migrationProgressEl.interText = "Working...";
+  }
+}
 
-      const migrateUnread = migrateUnreadEl.checked;
-      const migrateRead = migrateReadEl.checked;
-      const archiveUnread = archiveUnreadEl.checked;
-      const archiveRead = archiveReadEl.checked;
+function attachMigrationEventListeners() {
+  migrationButton.addEventListener("click", async () => {
+    migrationButton.disabled = true;
+    const migrationProgressEl = document.getElementById("migration_progress");
+    migrationProgressEl.innerText = "Working...";
 
-      const {migrated, skipped} = await migrateToWallabag({
-        migrateUnread,
-        migrateRead,
-        archiveUnread,
-        archiveRead,
-        tagsToAdd: [tagsEl.value.trim()],
-        readingListEntries,
-      });
+    const migrateUnread = migrateUnreadEl.checked;
+    const migrateRead = migrateReadEl.checked;
+    const archiveUnread = archiveUnreadEl.checked;
+    const archiveRead = archiveReadEl.checked;
 
-      migrationProgressEl.innerText = `Success! Migrated ${migrated} and skipped ${skipped} entries from reading list to Wallabag.`;
+    const {migrated, skipped} = await migrateToWallabag({
+      migrateUnread,
+      migrateRead,
+      archiveUnread,
+      archiveRead,
+      tagsToAdd: [tagsEl.value.trim()],
+      readingListEntries,
     });
 
-  }
+    migrationProgressEl.innerText = `Success! Copied ${migrated} and skipped ${skipped} entries from reading list to Wallabag.`;
+
+    updateMigrationSection();
+  });
 }
 
 document.addEventListener('DOMContentLoaded', async function () {
     Common.translateAll();
     const PC = new OptionsController();
     await PC.init();
-    await initMigrationSection();
+    await updateMigrationSection();
+    attachMigrationEventListeners();
 });

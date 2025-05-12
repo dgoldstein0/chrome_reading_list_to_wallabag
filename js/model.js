@@ -61,11 +61,11 @@ export async function migrateToWallabag(options) {
     const shouldArchive = entry.hasBeenRead ? archiveRead : archiveUnread;
 
     if (shouldMigrate) {
-      console.log(`migrating ${entry.url}`);
 
       const {exists} = await api.EntryExists(entry.url);
 
       if (!exists) {
+        console.log(`migrating ${entry.url}`);
         const {id: articleId} = await api.SavePage({
           url: entry.url,
           title: entry.title,
@@ -75,6 +75,7 @@ export async function migrateToWallabag(options) {
 
         await api.SaveTags(articleId, tagsToAdd);
       } else {
+        console.log(`skipping ${entry.url}`);
         skipped++;
       }
     }
