@@ -78,6 +78,10 @@ export async function migrateToWallabag(options) {
         console.log(`skipping ${entry.url}`);
         skipped++;
       }
+
+      if (deleteMigrated) {
+        await chrome.readingList.removeEntry({url});
+      }
     }
 
   }
