@@ -35,7 +35,7 @@ class OptionsController {
   }
 
   save() {
-    const data = this.save();
+    const data = saveSetup();
     Object.assign(this.data, data);
     if (this.data.Debug) {
         console.log('setup saved:', data);
@@ -463,12 +463,12 @@ async function updateMigrationSection() {
   document.getElementById("reading_list_info").innerText = `${numRead} read entries and ${numUnread} unread entries`;
 
 
-  if (numUnread === 0) {
+  if (numRead === 0) {
     migrateReadEl.disabled = true;
     archiveReadEl.disabled = true;
   }
 
-  if (numRead === 0) {
+  if (numUnread === 0) {
     migrateUnreadEl.disabled = true;
     archiveUnreadEl.disabled = true;
   }
