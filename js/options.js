@@ -444,6 +444,7 @@ const archiveUnreadEl = document.getElementById("archive_unread");
 const tagsEl = document.getElementsByName("tag")[0];
 const migrationButton = document.getElementById("migration_button");
 const deleteButton = document.getElementById("delete_button");
+const migrationPlanEl = document.getElementById("migration_plan");
 let readingListEntries;
 
 async function updateMigrationSection() {
@@ -461,6 +462,7 @@ async function updateMigrationSection() {
 
   document.getElementById("reading_list_info").innerText = `${numRead} read entries and ${numUnread} unread entries`;
 
+
   if (numUnread === 0) {
     migrateReadEl.disabled = true;
     archiveReadEl.disabled = true;
@@ -471,14 +473,39 @@ async function updateMigrationSection() {
     archiveUnreadEl.disabled = true;
   }
 
-  if (numUnread === 0 && numRead === 0) {
+  if (numUnread === 0 && numRead === 0 || (!migrateUnreadEl.checked && !migrateReadEl.checked)) {
     migrationButton.disabled = true;
   } else {
     migrationButton.disabled = false;
 
-    // fill in migration plan
-
   }
+
+  let migrationPlan = '';
+  if (migrateReadEl.checked) {
+    if (archiveReadEl.checked) {
+      migrationPlan += "Copy read items from Chrome's reading list to Wallabag and archive them.\n";
+    } else {
+      migrationPlan += "Copy read items from Chrome's reading list to Wallabag and leave them unread.\n";
+    }
+  }
+  if (migrateUnreadEl.checked) {
+    if (archiveUnreadEl.checked) {
+      migrationPlan += "Copy unread items from Chrome's reading list to Wallabag and archive them.\n";
+    } else {
+      migrationPlan += "Copy unread items from Chrome's reading list to Wallabag and leave them unread.\n";
+    }
+  }
+  const tagValue = getTag();
+  if (tagValue) {
+    migrationPlan += `All items added to wallabag will get the tag '${tagValue}'`
+  }
+
+  // fill in migration plan
+  migrationPlanEl.innerText = migrationPlan
+}
+
+function getTag() {
+  return tagsEl.value.trim();
 }
 
 function attachMigrationEventListeners() {
@@ -487,31 +514,37 @@ function attachMigrationEventListeners() {
     const migrationProgressEl = document.getElementById("migration_progress");
     migrationProgressEl.innerText = "Working...";
 
-    const migrateUnread = migrateUnreadEl.checked;
-    const migrateRead = migrateReadEl.checked;
-    const archiveUnread = archiveUnreadEl.checked;
-    const archiveRead = archiveReadEl.checked;
+    try {
+      const migrateUnread = migrateUnreadEl.checked;
+      const migrateRead = migrateReadEl.checked;
+      const archiveUnread = archiveUnreadEl.checked;
+      const archiveRead = archiveReadEl.checked;
 
-    const {migrated, skipped} = await migrateToWallabag({
-      migrateUnread,
-      migrateRead,
-      archiveUnread,
-      archiveRead,
-      tagsToAdd: [tagsEl.value.trim()],
-      readingListEntries,
-    });
+      const {migrated, skipped} = await migrateToWallabag({
+        migrateUnread,
+        migrateRead,
+        archiveUnread,
+        archiveRead,
+        tagsToAdd: [getTag()],
+        readingListEntries,
+      });
 
-    migrationProgressEl.innerText = `Success! Copied ${migrated} and skipped ${skipped} entries from reading list to Wallabag.`;
-
-    updateMigrationSection();
+      migrationProgressEl.innerText = `Success! Copied ${migrated} and skipped ${skipped} entries from reading list to Wallabag.`;
+    } finally {
+      await updateMigrationSection();
+    }
   });
 
   deleteButton.addEventListener("click", async () => {
     try {
       await deleteWallabagUrlsFromChromeReadingList(readingListEntries);
     } finally {
-      updateMigrationSection();
+      await updateMigrationSection();
     }
+  });
+
+  [migrateReadEl, archiveReadEl, migrateUnreadEl, archiveUnreadEl, tagsEl].forEach(element => {
+    element.addEventListener("change", updateMigrationSection);
   });
 }
 

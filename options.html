@@ -230,18 +230,22 @@
     </div>
     <div class="column col-12">
         <h1>Migration</h1>
-
+        <h3>Migration Options</h3>
         <p>Your reading list contains <span id="reading_list_info">(loading...)</span></p>
         <label class="form-switch" for="migrate_read"><input type="checkbox" id="migrate_read" /><i class="form-icon"></i>Migrate read items</label>
         <label class="form-switch" for="migrate_unread"><input type="checkbox" id="migrate_unread" /><i class="form-icon"></i>Migrate unread items</label>
-        <label class="form-switch" for="archive_read"><input type="checkbox" id="archive_read" checked /><i class="form-icon"></i>Archive read items</label>
+        <label class="form-switch" for="archive_read"><input type="checkbox" id="archive_read" checked /><i class="form-icon"></i>Archive read items [recommended]</label>
         <label class="form-switch" for="archive_unread"><input type="checkbox" id="archive_unread" /><i class="form-icon"></i>Archive unread items</label>
         <label for="tag">Tag migrated urls? <input type="text" name="tag" value="Migrated from Chrome Reading List" size="50"/></label>
         <br />
-        <button class="btn" id="migration_button">Migrate!</button>
+        <h3>Migration Plan</h3>
+        <p id="migration_plan"></p>
         <br />
-        <button class="btn" id="delete_button">Delete items in Wallabag from Chrome Reading List</button>
+        <p>Warning: the migration does not preserve the time the article was added to your reading list, as Wallabag gives no way to set that.  Nor for read items will it preserve the timestamp at which the url was read.</p>
+        <button class="btn" id="migration_button">Migrate!</button>
         <span id="migration_progress"></span>
+        <h3>Cleanup</h3>
+        <button class="btn" id="delete_button">Delete items in Wallabag from Chrome Reading List</button>
 
     </div>
 
