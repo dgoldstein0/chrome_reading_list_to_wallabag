@@ -1,14 +1,9 @@
 import {WallabagApi} from './wallabag-api.js';
-import {Cache} from './cache.js';
 
 const api = new WallabagApi();
 
-const cache = new Cache(true); // TODO - here checking option
-const existCache = new Cache(true);
 
-api.init().then(data => {
-    api.GetTags().then(tags => { cache.set('allTags', tags); });
-});
+api.init()
 
 export async function setup() {
   await api.load();
