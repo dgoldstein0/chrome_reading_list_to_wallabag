@@ -236,10 +236,11 @@
         <label class="form-switch" for="migrate_unread"><input type="checkbox" id="migrate_unread" /><i class="form-icon"></i>Migrate unread items</label>
         <label class="form-switch" for="archive_read"><input type="checkbox" id="archive_read" checked /><i class="form-icon"></i>Archive read items</label>
         <label class="form-switch" for="archive_unread"><input type="checkbox" id="archive_unread" /><i class="form-icon"></i>Archive unread items</label>
-        <label class="form-switch" for="delete_migrated"><input type="checkbox" id="delete_migrated" /><i class="form-icon"></i>Delete migrated items</label>
         <label for="tag">Tag migrated urls? <input type="text" name="tag" value="Migrated from Chrome Reading List" size="50"/></label>
         <br />
-        <button id="migration_button">Migrate!</button>
+        <button class="btn" id="migration_button">Migrate!</button>
+        <br />
+        <button class="btn" id="delete_button">Delete items in Wallabag from Chrome Reading List</button>
         <span id="migration_progress"></span>
 
     </div>

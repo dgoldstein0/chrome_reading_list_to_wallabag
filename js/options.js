@@ -1,4 +1,4 @@
-import {setup, saveSetup, setupGetToken, setupCheckUrl, migrateToWallabag} from './model.js';
+import {setup, saveSetup, setupGetToken, setupCheckUrl, migrateToWallabag, deleteWallabagUrlsFromChromeReadingList} from './model.js';
 
 
 class OptionsController {
@@ -441,9 +441,9 @@ const migrateReadEl = document.getElementById("migrate_read");
 const archiveReadEl = document.getElementById("archive_read");
 const migrateUnreadEl = document.getElementById("migrate_unread");
 const archiveUnreadEl = document.getElementById("archive_unread");
-const deleteMigratedEl = document.getElementById("delete_migrated");
 const tagsEl = document.getElementsByName("tag")[0];
 const migrationButton = document.getElementById("migration_button");
+const deleteButton = document.getElementById("delete_button");
 let readingListEntries;
 
 async function updateMigrationSection() {
@@ -491,14 +491,12 @@ function attachMigrationEventListeners() {
     const migrateRead = migrateReadEl.checked;
     const archiveUnread = archiveUnreadEl.checked;
     const archiveRead = archiveReadEl.checked;
-    const deleteMigrated = deleteMigratedEl.checked;
 
     const {migrated, skipped} = await migrateToWallabag({
       migrateUnread,
       migrateRead,
       archiveUnread,
       archiveRead,
-      deleteMigrated,
       tagsToAdd: [tagsEl.value.trim()],
       readingListEntries,
     });
@@ -506,6 +504,14 @@ function attachMigrationEventListeners() {
     migrationProgressEl.innerText = `Success! Copied ${migrated} and skipped ${skipped} entries from reading list to Wallabag.`;
 
     updateMigrationSection();
+  });
+
+  deleteButton.addEventListener("click", async () => {
+    try {
+      await deleteWallabagUrlsFromChromeReadingList(readingListEntries);
+    } finally {
+      updateMigrationSection();
+    }
   });
 }
 
