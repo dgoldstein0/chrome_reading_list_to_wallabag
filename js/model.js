@@ -89,7 +89,7 @@ export async function deleteWallabagUrlsFromChromeReadingList(readingListEntries
   let deleted = 0;
 
   // fire off requests in parallel for faster processing
-  const urlToExistsPromise =  readingListEntries.map(entry => entry.url).map(getUrlToExistsPromiseMap);
+  const urlToExistsPromise =  getUrlsToExistsPromiseMap(readingListEntries.map(entry => entry.url))
 
   for (const [url, existsPromise] of urlToExistsPromise) {
     const {exists} = await existsPromise;
@@ -104,6 +104,6 @@ export async function deleteWallabagUrlsFromChromeReadingList(readingListEntries
   return deleted;
 }
 
-function getUrlToExistsPromiseMap(urls) {
+function getUrlsToExistsPromiseMap(urls) {
   return new Map(urls.map(url => [url, api.EntryExists(url)]));
 }
