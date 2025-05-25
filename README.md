@@ -9,4 +9,4 @@ It logs into Wallabag the same way as wallabagger.  Then the user has the option
 - tag any newly-created items in wallabag with a tag of your choice
 - delete any items from Chrome's reading list which are already in wallabag
 
-
+For copying items to Wallabag, only items that don't yet exist in Wallabag are copied, so the migration is generally safe to run multiple times.  That said this is a one-directional tool - it does not support copying items from Wallabag into Chrome's reading list.
