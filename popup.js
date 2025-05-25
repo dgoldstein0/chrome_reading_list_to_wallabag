@@ -13,6 +13,10 @@ async function populatePopup() {
   }
 
   document.getElementById("status").innerText = `Found ${numRead} read entries and ${numUnread} unread entries on the reading list`;
+  document.getElementById("open_link").addEventListener("click", (e) => {
+    e.preventDefault();
+    chrome.runtime.openOptionsPage();
+  });
 }
 
 populatePopup();
