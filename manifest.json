@@ -11,6 +11,9 @@
       "readingList",
       "storage"
   ],
+  "optional_permissions": [
+      "bookmarks"
+  ],
   "optional_host_permissions": [
     "*://*/*"
   ],

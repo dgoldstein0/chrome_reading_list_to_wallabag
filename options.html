@@ -246,7 +246,15 @@
         <span id="migration_progress"></span>
         <h3>Cleanup</h3>
         <button class="btn" id="delete_button">Delete items in Wallabag from Chrome Reading List</button>
-
+    </div>
+    <br />
+    <div class="column col-12">
+        <h1>Bookmarks copying tool</h1>
+        <button class="btn" id="load_bookmarks">Load bookmarks</button>
+        <p>Your bookmarks contain <span id="bookmarks_info">(not yet loaded)</span> bookmarks</p>
+        <label class="form-switch" for="archive_bookmarks"><input type="checkbox" id="archive_bookmarks" /><i class="form-icon"></i>Mark copied items as archived?</label>
+        <label for="bookmark_tag">Tag migrated urls? <input type="text" name="bookmark_tag" value="Migrated from Chrome Bookmarks" size="50"/></label>
+        <button class="btn" id="copy_bookmarks_to_wallabag" disabled>Copy all bookmarks!</button>
     </div>
 
 

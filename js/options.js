@@ -1,4 +1,4 @@
-import {setup, saveSetup, setupGetToken, setupCheckUrl, migrateToWallabag, deleteWallabagUrlsFromChromeReadingList} from './model.js';
+import {setup, saveSetup, setupGetToken, setupCheckUrl, migrateToWallabag, deleteWallabagUrlsFromChromeReadingList, migrateBookmarksToWallabag} from './model.js';
 
 
 class OptionsController {
@@ -31,6 +31,15 @@ class OptionsController {
     this.openFileDialog = document.getElementById('openFile-dialog');
     this.httpsMessage = document.getElementById('https-message');
     this.httpsButton = document.getElementById('https-button');
+
+    // bookmarks stuff
+    this.loadBookmarksButton = document.getElementById('load_bookmarks');
+    this.bookmarksInfo = document.getElementById('bookmarks_info');
+    this.archiveBookmarks = document.getElementById('archive_bookmarks');
+    this.bookmarkTag = document.getElementsByName('bookmark_tag')[0];
+    this.copyBookmarksToWallabag = document.getElementById('copy_bookmarks_to_wallabag');
+
+
     this.addListeners_();
   }
 
@@ -53,6 +62,9 @@ class OptionsController {
       this.clearButton.addEventListener('click', this.clearClick.bind(this));
       this.openFileDialog.addEventListener('change', this.loadFromFile.bind(this));
       this.httpsButton.addEventListener('click', this.httpsButtonClick.bind(this));
+
+      this.loadBookmarksButton.addEventListener('click', this.loadBookmarks.bind(this));
+      this.copyBookmarksToWallabag.addEventListener('click', this.copyBookmarks.bind(this));
   }
 
   httpsButtonClick() {
@@ -434,6 +446,27 @@ class OptionsController {
     this.setFields();
   }
 
+  loadBookmarks() {
+    chrome.permissions.request({permissions: ['bookmarks']}, async (granted) => {
+      if (granted) {
+        const bookmarkEntries = await scanBookmarks();
+
+        this.bookmarksInfo.innerText = bookmarkEntries.length;
+        this.copyBookmarksToWallabag.disabled = false;
+
+      } else {
+        console.log("permission denied");
+      }
+    })
+  }
+
+  async copyBookmarks() {
+    const shouldArchive = this.archiveBookmarks.checked;
+    const tagToAdd = this.bookmarkTag.value.trim();
+    const {migrated, skipped} = await migrateBookmarksToWallabag({shouldArchive, tagsToAdd: tagToAdd ? [tagToAdd] : [], entries: bookmarkEntries});
+
+    console.log(`Success! Copied ${migrated} and skipped ${skipped} entries from Chrome Bookmarks to Wallabag.`);
+  }
 };
 
 
@@ -502,6 +535,27 @@ async function updateMigrationSection() {
 
   // fill in migration plan
   migrationPlanEl.innerText = migrationPlan
+}
+
+let bookmarkEntries = [];
+
+async function scanBookmarks() {
+  bookmarkEntries = [];
+  const bookmarks = await chrome.bookmarks.getTree();
+  function traverse(bookmarks) {
+    for (const b of bookmarks) {
+      if (b.children) {
+        traverse(b.children);
+      } else if (b.url) {
+        bookmarkEntries.push(b);
+      } else {
+        console.warn("Found bookmark entry with no children and no url, skipping", b);
+      }
+    }
+  }
+  traverse(bookmarks);
+
+  return bookmarkEntries;
 }
 
 function getTag() {

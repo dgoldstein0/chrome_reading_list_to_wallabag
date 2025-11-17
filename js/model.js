@@ -107,3 +107,40 @@ export async function deleteWallabagUrlsFromChromeReadingList(readingListEntries
 function getUrlsToExistsPromiseMap(urls) {
   return new Map(urls.map(url => [url, api.EntryExists(url)]));
 }
+
+
+export async function migrateBookmarksToWallabag(options) {
+  const {shouldArchive, tagsToAdd, entries} = options;
+
+  let skipped = 0;
+  let migrated = 0;
+
+  for (const entry of entries) {
+    const url = entry.url;
+
+    const {exists} = await api.EntryExists(url);
+
+    if (!exists) {
+      console.log(`migrating ${url}`);
+      // if a url is already in wallabag, saving it again will effectively clobber it
+      // hence we only want to do this for urls that don't already exist in wallabag.
+      const {id: articleId} = await api.SavePage({
+        url: url,
+        title: entry.title,
+        archive: shouldArchive,
+      })
+      migrated++;
+
+      await api.SaveTags(articleId, tagsToAdd);
+    } else {
+      console.log(`Found ${url} already in wallabag, not migrating`);
+      skipped++;
+    }
+
+  }
+
+  return {
+    migrated,
+    skipped
+  };
+}
